@@ -11,8 +11,8 @@ Program <- function(){
 }
 
 
-d1<-read.table("/Users/Dungeoun/Documents/sample1.txt", fill = TRUE)
-p2<-read.table("/Users/Dungeoun/Documents/partition2.txt", fill = TRUE)
+d1<-read.table("/Users/Dungeoun/Documents/Amit UTD Course Material/Machine Learning CS 6375 /sample1.txt", fill = TRUE)
+p2<-read.table("/Users/Dungeoun/Documents/Amit UTD Course Material/Machine Learning CS 6375 /partition2.txt", fill = TRUE)
 
 
 # Code to clean the data and extract info
@@ -20,6 +20,9 @@ p2<-read.table("/Users/Dungeoun/Documents/partition2.txt", fill = TRUE)
 
 
 partition<-function(dataset1, partition2){
+
+	install.packages("plyr")
+	library("plyr")
 	
 # step 1: read the dataset and the partition2
 	
@@ -53,28 +56,32 @@ partition<-function(dataset1, partition2){
 		
 		x<-pf[,i]
 		
-		m1[i,1]<- length(x[!is.na(x)])		# taking only non NA Values and
-											# storing them in m1
-			
-			
+		tryCatch({
+		m1[i,1]<- length(x[!is.na(x)])		# taking only non NA Values 														# and
+														# storing them in m1
+					
+		}, error=function(e){cat("ERROR1 :",conditionMessage(e), "\n")})
 	}
+	print("clear 1")
+	# m2: matrices holding the last column contents of different partitions
 	
-	# m2: matrices holding the contents of different partitions
-	
-	m2<-matrix(0,max(m1),length(m1))
+	m2<-matrix(NA,max(m1),length(m1))
 	
 	for(i in 1:nrow(m2)){
-		
+		tryCatch({
 		for(j in 1:m1[i,1]){
+			
 			
 			m2[j,i]<-df[pf[j,i],ncol(df)]   # taking values from df into m2 
 											# with help of pf as index
 											
 											# MAY NEED TRY-CATCH STATEMENT
 											
+			
 		}
+		}, error=function(e){cat("ERROR1 :",conditionMessage(e),"\n")})
 	}
-	
+	print("clear 2")
 	# m3: matrix holding the frequencies of different elements of last column
 	
 	m3<-matrix(NA, max(m1), length(m1))
@@ -85,11 +92,11 @@ partition<-function(dataset1, partition2){
 	
 	for( i in 1:ncol(m3)){
 		
-		for(j in 1:length(m2[,i][!is.na(m2[,i])])){ 		  #taking the length not including the na values 	
+		for(j in 1:length(m2[,i][!is.na(m2[,i])])){ 		  #taking the length 															 not including the na 																	values 	
 			
 			m3[j,i] <- count(m2[,i][!is.na(m2[,i])])$freq[j]
 			m4[j,i] <- count(m2[,i][!is.na(m2[,i])])$x[j]
-			print(j)
+			#print(j)
 			
 		}
 		
@@ -107,14 +114,14 @@ partition<-function(dataset1, partition2){
 		
 		for( j in 1:length(m3[,i][!is.na(m3[,i])])){
 			
-			m5[1,i]<- m5[1,i] - (m3[j,i]/m1[i,1])*log2(m3[j,i]/m1[i,1])	#Entropy Function
-			print(j)
+			m5[1,i]<- m5[1,i] - (m3[j,i]/m1[i,1])*log2(m3[j,i]/m1[i,1])
+			#print(j)
+			
+			
 		}
 	}
-
-
-		
-}
+	print(m5)
+} 
 
 	
 	
