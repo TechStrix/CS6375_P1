@@ -75,6 +75,43 @@ partition<-function(dataset1, partition2){
 		}
 	}
 	
+	# m3: matrix holding the frequencies of different elements of last column
+	
+	m3<-matrix(NA, max(m1), length(m1))
+	
+	# m4: matrix holding the corresponding elements of the frequency table
+	
+	m4<-matrix(NA, max(m1), length(m1))
+	
+	for( i in 1:ncol(m3)){
+		
+		for(j in 1:length(m2[,i][!is.na(m2[,i])])){ 		  #taking the length not including the na values 	
+			
+			m3[j,i] <- count(m2[,i][!is.na(m2[,i])])$freq[j]
+			m4[j,i] <- count(m2[,i][!is.na(m2[,i])])$x[j]
+			print(j)
+			
+		}
+		
+					
+			
+	}
+	
+	
+	# Calculating the Entropy of all the features
+	# m5: matrix holding the entropies of each partition
+	
+	m5<-matrix(0,1,ncol(pf)) 
+	
+	for(i in 1:ncol(pf)){
+		
+		for( j in 1:length(m3[,i][!is.na(m3[,i])])){
+			
+			m5[1,i]<- m5[1,i] - (m3[j,i]/m1[i,1])*log2(m3[j,i]/m1[i,1])	#Entropy Function
+			print(j)
+		}
+	}
+
 
 		
 }
