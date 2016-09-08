@@ -20,9 +20,6 @@ p2<-read.table("/Users/Dungeoun/Documents/Amit UTD Course Material/Machine Learn
 
 
 partition<-function(dataset1, partition2){
-
-	install.packages("plyr")
-	library("plyr")
 	
 # step 1: read the dataset and the partition2
 	
@@ -76,7 +73,7 @@ partition<-function(dataset1, partition2){
 											# with help of pf as index
 											
 											# MAY NEED TRY-CATCH STATEMENT
-											
+			print(j)								
 			
 		}
 		}, error=function(e){cat("ERROR1 :",conditionMessage(e),"\n")})
@@ -121,6 +118,94 @@ partition<-function(dataset1, partition2){
 		}
 	}
 	print(m5)
+	
+	
+	
+	
+	#m6: Matrix Holding Conditional entropies of all partitions (each in 1 column)
+	#m7: Temporary Matrix for holding single array
+	
+	m6<-
+	
+	for( i in 1: 1: ncol(pf)){
+		
+		#one column holds conditional probabilities of one partition only
+		
+		for(j in 1: ncol(df) - 1){
+			
+			#next nested loop will make a temporary matrix 
+			
+			m7<-matrix(NA, nrow(pf), 2)
+			
+			for(k in 1:nrow(m1)){
+				
+				
+				#forming a single matrix
+				for(l in 1:m1[k]){
+					
+					a1<-pf[k,l]						#1st run pf[1,1] pf[1,2]  pf[2,1] pf[2,2] pf[2,3] pf[2,4]
+					
+					m7[l,1]<- df[a1,k]				# taking value of df at [index a1, column k] into m7
+					m7[l,2]<- df[a1,df[ncol(df)]]	# taking the target attribute value in adjacent columnfm7
+					
+				}
+				
+				#Calculate entropy of this matrix
+				
+				#step1: Calculate the probabilities of labels of this matrix P(s1|attribute)
+				
+				# 1.1: m8: matrix of unique labels
+				m8<-matrix(NA,nrow(m7),1)
+				m8<-t(t(count(m7[,1])$x))
+				
+				# 1.2: m9: matrix of freq of each label
+					
+				m9<-matrix(NA,nrow(m7),1)
+				m9<-t(t(count(m7[,1])$freq))
+					
+				# 1.3: m10: Probability of each label from total no. of labels
+				
+				m10<-matrix(NA, nrow(m7),1)
+				for( i in 1: nrow(m10)){
+					m10[i,1]<-m9[i,1]/sum(m9)
+				}	
+				
+				#Step 2: Calculate the probabilities of last attributes	
+				
+				# 2.1: m11:Matrix Containing the Values according to the uniqueness of the labels columnwise
+				m11<-matrix(NA,nrow(pf),nrow(m8) )		# No. of columns = no. of unique labels
+														# No. of rows < no. of total ele in parti  
+				
+				for(i in 1:nrow(m8)){					#traversing m8: having attri & target value
+					k = 1								# k counter doesn't move if value doesn't match label
+					for(j in 1:nrow(m7)){
+					
+						if(m7[j,1]==m8[i,1]){    	#if element frm all label table = element from unique 														#label table
+							
+							m11[k,i]<-m7[j,2]		# put target elemwnt from all label table to matrix 														# (column wise)
+							k<-k+1
+						}
+					}
+								
+				}
+				
+				#2.2: 
+				
+				
+				
+				
+			}
+			
+			#next nested loop will calculate the conditional entropy of that matrix
+			
+			
+		}
+	}
+
+
+
+
+
 } 
 
 	
