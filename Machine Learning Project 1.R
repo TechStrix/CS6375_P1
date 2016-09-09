@@ -124,31 +124,27 @@ partition<-function(dataset1, partition2){
 	
 	#m6: Matrix Holding Conditional entropies of all partitions (each in 1 column)
 	#m7: Temporary Matrix for holding single array
+	z <- ncol(df) - 1
+	m6<-matrix(NA, ncol(df)-1,ncol(pf) )
 	
-	m6<-
-	
-	for( i in 1: 1: ncol(pf)){
-		
-		#one column holds conditional probabilities of one partition only
-		
-		for(j in 1: ncol(df) - 1){
-			
-			#next nested loop will make a temporary matrix 
-			
-			m7<-matrix(NA, nrow(pf), 2)
-			
-			for(k in 1:nrow(m1)){
+		for(l in 1:ncol(pf)){			
+			print(l)	
+			for(k in 1:z){		
+				m7<-matrix(NA, m1[l,1], 2)
 				
+				a = 0	
+				for(n in 1:m1[l,1]){
 				
-				#forming a single matrix
-				for(l in 1:m1[k]){
+					a=a+1
+					b=pf[a,l]
+					m7[n,1]<- df[b,k]
+					m7[n,2]<- df[b,ncol(df)]
 					
-					a1<-pf[k,l]						#1st run pf[1,1] pf[1,2]  pf[2,1] pf[2,2] pf[2,3] pf[2,4]
-					
-					m7[l,1]<- df[a1,k]				# taking value of df at [index a1, column k] into m7
-					m7[l,2]<- df[a1,df[ncol(df)]]	# taking the target attribute value in adjacent columnfm7
+					#m7[l,1]<- df[pf[m1[l,1],l],k]		# taking value of df at [index a1, column k] into m7
+					#m7[l,2]<- df[pf[m1[l,1],l],df[ncol(df)]]	# taking the target attribute value
 					
 				}
+				print(m7)
 				
 				#Calculate entropy of this matrix
 				
@@ -156,17 +152,16 @@ partition<-function(dataset1, partition2){
 				
 				# 1.1: m8: matrix of unique labels
 				m8<-matrix(NA,nrow(m7),1)
-				m8<-t(t(count(m7[,1])$x))
+				m8<-t(t(count(m7[,1][!is.na(m7[,1])])$x))
 				
 				# 1.2: m9: matrix of freq of each label
-					
-				m9<-matrix(NA,nrow(m7),1)
-				m9<-t(t(count(m7[,1])$freq))
-					
+				m9<-matrix(NA,nrow(m7),1)	
+				m9<-t(t(count(m7[,1][!is.na(m7[,1])])$freq))
+				
 				# 1.3: m10: Probability of each label from total no. of labels
 				
-				m10<-matrix(NA, nrow(m7),1)
-				for( i in 1: nrow(m10)){
+				m10<-matrix(NA, nrow(m9),1)
+				for( i in 1: nrow(m9)){
 					m10[i,1]<-m9[i,1]/sum(m9)
 				}	
 				
@@ -177,36 +172,52 @@ partition<-function(dataset1, partition2){
 														# No. of rows < no. of total ele in parti  
 				
 				for(i in 1:nrow(m8)){					#traversing m8: having attri & target value
-					k = 1								# k counter doesn't move if value doesn't match label
+					t = 1								# k counter doesn't move if value doesn't match label
 					for(j in 1:nrow(m7)){
 					
-						if(m7[j,1]==m8[i,1]){    	#if element frm all label table = element from unique 														#label table
+						if(identical(m7[j,1],m8[i,1])){ #if element frm all label table = element from unique 														# label table
 							
-							m11[k,i]<-m7[j,2]		# put target elemwnt from all label table to matrix 														# (column wise)
-							k<-k+1
+							m11[t,i]<-m7[j,2]		# put target elemwnt from all label table to matrix 														# (column wise)
+							t<-t+1
 						}
 					}
 								
 				}
 				
-				#2.2: 
+				#2.2: m12: Matrix holds the probabilities in different columns of each unique label
+				
+				m12<-matrix(NA, nrow(m7), ncol(m11))		
+				
+				for(i in 1:ncol(m11)){
+					for(j in 1:nrow(m7)){
+					
+					m12[j,i]<-count(m11[,i][!is.na(m11[,i])])$freq[j]/length(m11[,i][!is.na(m11[,i])])				
+					
+					}
+				}
 				
 				
 				
+				#Step 3: Calculate Entropy of the which is also the conditional probability
 				
+				# m13 : Matrix that will hold the conditional entropy
+				m13<-matrix(0,nrow(m10),1)
+				
+				tryCatch({
+				for( i in 1:nrow(m10)){
+					for(j in 1:nrow(m12)){
+						
+						m13[i,1]<- -1*m10[i,1][!is.na(m10[i,1])]*(m12[j,i][!is.na(m12[j,i])])*log2(m12[j,i][!is.na(m12[j,i])])
+						
+					}
+				}
+				},error=function(e){})
+				#print(m13)
+				
+			m6[l,k]<-sum(m13)
 			}
-			
-			#next nested loop will calculate the conditional entropy of that matrix
-			
-			
+					
 		}
-	}
-
-
-
-
-
-} 
 
 	
 	
