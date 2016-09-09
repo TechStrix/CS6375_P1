@@ -186,7 +186,7 @@ partition<-function(dataset1, partition2){
 				
 				#2.2: m12: Matrix holds the probabilities in different columns of each unique label
 				
-				m12<-matrix(NA, nrow(m7), ncol(m11))		
+				m12<-matrix(1, nrow(m7), ncol(m11))		
 				
 				for(i in 1:ncol(m11)){
 					for(j in 1:nrow(m7)){
@@ -196,22 +196,24 @@ partition<-function(dataset1, partition2){
 					}
 				}
 				
-				
+				#print(m12)
 				
 				#Step 3: Calculate Entropy of the which is also the conditional probability
 				
 				# m13 : Matrix that will hold the conditional entropy
-				m13<-matrix(0,nrow(m10),1)
+				m13<-matrix(0,nrow(m10),ncol(m11))
 				
-				tryCatch({
+				
 				for( i in 1:nrow(m10)){
-					for(j in 1:nrow(m12)){
+					tryCatch({
+					for(j in 1:length(m12[!is.na(m12)])){
 						
-						m13[i,1]<- -1*m10[i,1][!is.na(m10[i,1])]*(m12[j,i][!is.na(m12[j,i])])*log2(m12[j,i][!is.na(m12[j,i])])
+						m13[j,i]<- m10[i,1]*(m12[j,i][!is.na(m12[j,i])])*log2(1/m12[j,i][!is.na(m12[j,i])])
 						
 					}
+					},error=function(e){})
+
 				}
-				},error=function(e){})
 				#print(m13)
 				
 			m6[l,k]<-sum(m13)
