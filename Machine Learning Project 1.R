@@ -1,5 +1,4 @@
-install.packages("plyr")
-library("plyr")
+
 
 
 Program <- function(){
@@ -20,6 +19,10 @@ p2<-read.table("/Users/Dungeoun/Documents/Amit UTD Course Material/Machine Learn
 
 
 partition<-function(dataset1, partition2){
+	
+	
+	install.packages("plyr")
+	library("plyr")
 	
 # step 1: read the dataset and the partition2
 	
@@ -122,10 +125,10 @@ partition<-function(dataset1, partition2){
 	
 	
 	
-	#m6: Matrix Holding Conditional entropies of all partitions (each in 1 column)
+	#m6: Matrix Holding Conditional entropies of all partitions (each in a row)
 	#m7: Temporary Matrix for holding single array
 	z <- ncol(df) - 1
-	m6<-matrix(NA, ncol(df)-1,ncol(pf) )
+	m6<-matrix(NA, ncol(pf),ncol(df)-1 )
 	
 		for(l in 1:ncol(pf)){			
 			print(l)	
@@ -217,9 +220,122 @@ partition<-function(dataset1, partition2){
 				#print(m13)
 				
 			m6[l,k]<-sum(m13)
-			}
-					
 		}
+					
+	}
+
+	# m14 :  Gain Matrix
+	
+	m14<-matrix(NA,nrow(m6),ncol(m6))
+	
+	for(i in 1: ncol(m6)){
+		for(j in 1:nrow(m6)){
+			
+			m14[i,j]<- m5[1,i] - m6[i,j] 
+			
+		}
+	}
+	
+	
+	#m15 : F-Matrix
+	
+	m15<-matrix(NA, 1, ncol(m14))
+	
+	for(i in 1:ncol(m14)){
+		
+			
+		m15[i]<-m1[i,]/nrow(df)*max(m14[i,])	
+			
+		
+	}
+	
+	# m16: Store Which Partition will get partitioned first
+	
+	m16<-which(m15 == max(m15), arr.ind = TRUE)[2]
+	
+	cat( "partition that will get partitioned first is ", colnames(pf)[m16])
+		
+	#m17: Store by which feature will the partition get partitioned
+	
+	m17<-which(m14 == max(m14[m16,]), arr.ind = TRUE)[2]
+	
+	cat( "/n","feature that will be used to partition is: Feature", m17)
+	
+	#m18: partition to be divided and it's target values 
+	#m19: final Partitions 
+	
+	m18<-matrix(NA, m1[m16,1], 2)
+	
+	a<-0
+	for(n in 1:m1[m16,1]){
+				
+		a=a+1
+		b=pf[a,m16]
+					
+		m18[n,1]<- pf[a,m16]			#m18: first col: index of the partition
+		m18[n,2]<- df[b,m17]			#m18: Second col: the labels of the partition
+				
+	}
 
 	
+
+	
+	m19<-matrix(NA,length(count(m18[,2])$x),nrow(m18))
+	
+	a<-0
+	
+	for( j in 1:length(count(m18[,2])$x)){
+		
+		a<-a+1
+		
+		for(i in 1:nrow(m18)){
+		
+			if(identical(m18[i,2], count(m18[,2])$x[a])){
+			
+			m19[j,i]<-m18[i,1]
+			
+			}
+			
+		}
+	}
+	
+	
+	
+	m20<-m19
+	
+	m20[is.na(m20)]<-c("")
+	
+	rnames<-c("P1","P2","P3","P4","P5","P6")
+	
+	
+	m20<-as.data.frame(m20)
+
+	cat("the partition", colnames(pf)[m16], "was replaced with partitions: " )
+	
+	for( i in 1:nrow(m20)){
+		cat(colnames(pf)[m16],i," ")
+	}
+	
+	#rownames of new partition
+	m21<-matrix(NA,1,nrow(m19))
+	
+	for( i in 1:nrow(m20)){
+		m21[1,i]<-paste(colnames(pf)[m16],i)
+	}
+	
+	rownames(m20)<- m21
+
+	temp<-t(pf[,-m16])
+	
+	colnames(temp)<-NULL
+	
+	m22<-rbind(temp,m20)
+	
+	m22[is.na(m22)]<-c("")
+	
+	m23<-noquote(m22)
+	
+	write.table(m23,"/Users/Dungeoun/Documents/Amit UTD Course Material/Machine Learning CS 6375 /output5.txt",quote = FALSE, col.names = FALSE)
+	
+}
 	
