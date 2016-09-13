@@ -1,25 +1,19 @@
 
 
+d1<-readline(prompt = "Enter the name of the datafile:")
 
-Program <- function(){
-	
-	
-	n <- readline(prompt="Enter program name: ")
-	
+p2<-readline(prompt = "Enter the first partition file name:")
 
-}
+p3<-readline(prompt = "Enter the new partition file name:")
 
 
-d1<-read.table("/Users/Dungeoun/Documents/Amit UTD Course Material/Machine Learning CS 6375 /sample1.txt", fill = TRUE)
-p2<-read.table("/Users/Dungeoun/Documents/Amit UTD Course Material/Machine Learning CS 6375 /partition2.txt", fill = TRUE)
+d1<-"samcopy.txt"
+p2<-"partcopy.txt"
 
 
 # Code to clean the data and extract info
 
-
-
-partition<-function(dataset1, partition2){
-	
+partition<-function(d1,p2){
 	
 	install.packages("plyr")
 	library("plyr")
@@ -29,15 +23,17 @@ partition<-function(dataset1, partition2){
 	#d1: Dataset table
 	#df: final dataset table
 	
-	d1<-read.table(dataset1, fill = TRUE)
+	d1<-read.table(file = d1, fill = TRUE)
 	d1<-as.data.frame(d1)
 	df<-d1[2:nrow(d1),]
 	rownames(df)<-c(1:nrow(df))
+	df<-as.matrix(df)
+	
 	
 	#p2: partitions
 	#pf: Final partition table
 	
-	p2<-read.table(partition2, fill = TRUE) 
+	p2<-read.table(file = p2, fill = TRUE) 
 	p2<-as.data.frame(p2)
 	rownames(p2)<-p2$V1
 	pf<-p2[,2:ncol(p2)]
@@ -62,7 +58,7 @@ partition<-function(dataset1, partition2){
 					
 		}, error=function(e){cat("ERROR1 :",conditionMessage(e), "\n")})
 	}
-	print("clear 1")
+	
 	# m2: matrices holding the last column contents of different partitions
 	
 	m2<-matrix(NA,max(m1),length(m1))
@@ -76,12 +72,12 @@ partition<-function(dataset1, partition2){
 											# with help of pf as index
 											
 											# MAY NEED TRY-CATCH STATEMENT
-			print(j)								
+											
 			
 		}
-		}, error=function(e){cat("ERROR1 :",conditionMessage(e),"\n")})
+		}, error=function(e){})
 	}
-	print("clear 2")
+	
 	# m3: matrix holding the frequencies of different elements of last column
 	
 	m3<-matrix(NA, max(m1), length(m1))
@@ -120,7 +116,7 @@ partition<-function(dataset1, partition2){
 			
 		}
 	}
-	print(m5)
+	
 	
 	
 	
@@ -131,8 +127,9 @@ partition<-function(dataset1, partition2){
 	m6<-matrix(NA, ncol(pf),ncol(df)-1 )
 	
 		for(l in 1:ncol(pf)){			
-			print(l)	
-			for(k in 1:z){		
+				
+			for(k in 1:z){
+						
 				m7<-matrix(NA, m1[l,1], 2)
 				
 				a = 0	
@@ -147,7 +144,10 @@ partition<-function(dataset1, partition2){
 					#m7[l,2]<- df[pf[m1[l,1],l],df[ncol(df)]]	# taking the target attribute value
 					
 				}
-				print(m7)
+				
+				m7<-noquote(m7)
+				
+				#print(m7)
 				
 				#Calculate entropy of this matrix
 				
@@ -156,18 +156,19 @@ partition<-function(dataset1, partition2){
 				# 1.1: m8: matrix of unique labels
 				m8<-matrix(NA,nrow(m7),1)
 				m8<-t(t(count(m7[,1][!is.na(m7[,1])])$x))
+				#print(m8)
 				
 				# 1.2: m9: matrix of freq of each label
 				m9<-matrix(NA,nrow(m7),1)	
 				m9<-t(t(count(m7[,1][!is.na(m7[,1])])$freq))
-				
+				#print(m9)
 				# 1.3: m10: Probability of each label from total no. of labels
 				
 				m10<-matrix(NA, nrow(m9),1)
 				for( i in 1: nrow(m9)){
 					m10[i,1]<-m9[i,1]/sum(m9)
 				}	
-				
+				#print(m10)
 				#Step 2: Calculate the probabilities of last attributes	
 				
 				# 2.1: m11:Matrix Containing the Values according to the uniqueness of the labels columnwise
@@ -187,6 +188,10 @@ partition<-function(dataset1, partition2){
 								
 				}
 				
+				m11<-noquote(m11)
+				
+				#print(m11)
+				
 				#2.2: m12: Matrix holds the probabilities in different columns of each unique label
 				
 				m12<-matrix(1, nrow(m7), ncol(m11))		
@@ -204,17 +209,19 @@ partition<-function(dataset1, partition2){
 				#Step 3: Calculate Entropy of the which is also the conditional probability
 				
 				# m13 : Matrix that will hold the conditional entropy
-				m13<-matrix(0,nrow(m10),ncol(m11))
+				m13<-matrix(0,length(m12[!is.na(m12)]),ncol(m11))
 				
 				
 				for( i in 1:nrow(m10)){
-					tryCatch({
-					for(j in 1:length(m12[!is.na(m12)])){
+					#tryCatch({
+					for(j in 1:length(m12[,i][!is.na(m12[,i])])){
 						
-						m13[j,i]<- m10[i,1]*(m12[j,i][!is.na(m12[j,i])])*log2(1/m12[j,i][!is.na(m12[j,i])])
+						mid<-t(t(m12[j,i]))
+						
+						m13[j,i]<- m10[i,1]*(mid)*log2(1/mid)
 						
 					}
-					},error=function(e){})
+					#},error=function(e){})
 
 				}
 				#print(m13)
@@ -259,7 +266,7 @@ partition<-function(dataset1, partition2){
 	
 	m17<-which(m14 == max(m14[m16,]), arr.ind = TRUE)[2]
 	
-	cat( "/n","feature that will be used to partition is: Feature", m17)
+	cat( " ||  ","feature that will be used to partition is: Feature", m17)
 	
 	#m18: partition to be divided and it's target values 
 	#m19: final Partitions 
@@ -277,7 +284,7 @@ partition<-function(dataset1, partition2){
 				
 	}
 
-	
+	m18<-noquote(m18)
 
 	
 	m19<-matrix(NA,length(count(m18[,2])$x),nrow(m18))
@@ -305,9 +312,6 @@ partition<-function(dataset1, partition2){
 	
 	m20[is.na(m20)]<-c("")
 	
-	rnames<-c("P1","P2","P3","P4","P5","P6")
-	
-	
 	m20<-as.data.frame(m20)
 
 	cat("the partition", colnames(pf)[m16], "was replaced with partitions: " )
@@ -324,18 +328,17 @@ partition<-function(dataset1, partition2){
 	}
 	
 	rownames(m20)<- m21
-
-	temp<-t(pf[,-m16])
 	
-	colnames(temp)<-NULL
+	colnames(m20)<-NULL
 	
-	m22<-rbind(temp,m20)
+		
+	temp<-t(pf[,-m16])	
 	
-	m22[is.na(m22)]<-c("")
 	
-	m23<-noquote(m22)
+		
+	write.table(temp,"/Users/Dungeoun/Documents/Amit UTD Course Material/Machine Learning CS 6375 /output8.txt",quote = FALSE, col.names = FALSE)
 	
-	write.table(m23,"/Users/Dungeoun/Documents/Amit UTD Course Material/Machine Learning CS 6375 /output5.txt",quote = FALSE, col.names = FALSE)
+		write.table(m20,"/Users/Dungeoun/Documents/Amit UTD Course Material/Machine Learning CS 6375 /output8.txt",quote = FALSE, col.names = FALSE, append = TRUE)
+	
 	
 }
-	
