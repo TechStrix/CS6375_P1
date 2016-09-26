@@ -10,8 +10,13 @@ Program <- function(){
 }
 
 
-d1<-read.table("/Users/Dungeoun/Documents/Amit UTD Course Material/Machine Learning CS 6375 /sample1.txt", fill = TRUE)
-p2<-read.table("/Users/Dungeoun/Documents/Amit UTD Course Material/Machine Learning CS 6375 /partition2.txt", fill = TRUE)
+dataset1<-read.table("/Users/Dungeoun/Documents/Amit UTD Course Material/Machine Learning CS 6375 /sam1.txt", fill = TRUE)
+partition2<-read.table("/Users/Dungeoun/Documents/Amit UTD Course Material/Machine Learning CS 6375 /part2.txt", fill = TRUE)
+
+
+d1<-read.table("/Users/Dungeoun/Documents/Amit UTD Course Material/Machine Learning CS 6375 /sam1.txt", fill = TRUE)
+p2<-read.table("/Users/Dungeoun/Documents/Amit UTD Course Material/Machine Learning CS 6375 /part2.txt", fill = TRUE)
+
 
 
 # Code to clean the data and extract info
@@ -29,7 +34,8 @@ partition<-function(dataset1, partition2){
 	#d1: Dataset table
 	#df: final dataset table
 	
-	
+	d1<-read.table(file=dataset1,fill = TRUE)
+
 	d1<-as.data.frame(d1)
 	df<-d1[2:nrow(d1),]
 	rownames(df)<-c(1:nrow(df))
@@ -39,7 +45,7 @@ partition<-function(dataset1, partition2){
 	#p2: partitions
 	#pf: Final partition table
 	
-	
+	d1<-read.table(file=partition2,fill =TRUE)
 	p2<-as.data.frame(p2)
 	rownames(p2)<-p2$V1
 	pf<-p2[,2:ncol(p2)]
@@ -238,7 +244,7 @@ partition<-function(dataset1, partition2){
 	
 	m14<-matrix(NA,nrow(m6),ncol(m6))
 	
-	for(i in 1: ncol(m6)){
+	for(i in 1: ncol(m5)){
 		for(j in 1:nrow(m6)){
 			
 			m14[i,j]<- m5[1,i] - m6[i,j] 
@@ -251,23 +257,23 @@ partition<-function(dataset1, partition2){
 	
 	m15<-matrix(NA, 1, ncol(m14))
 	
-	for(i in 1:ncol(m14)){
+	for(i in 1:nrow(m1)){
 		
 			
-		m15[i]<-m1[i,]/nrow(df)*max(m14[i,])	
+		m15[i]<-m1[i,]/nrow(df)*max(m14[i,][!is.na(m14[i,])])	
 			
 		
 	}
 	
 	# m16: Store Which Partition will get partitioned first
 	
-	m16<-which(m15 == max(m15), arr.ind = TRUE)[2]
+	m16<-which(m15[!is.na(m15)] == max(m15[!is.na(m15)]), arr.ind = TRUE)
 	
 	cat( "partition that will get partitioned first is ", colnames(pf)[m16])
 		
 	#m17: Store by which feature will the partition get partitioned
 	
-	m17<-which(m14 == max(m14[m16,]), arr.ind = TRUE)[2]
+	m17<-which(m14[m16,][!is.na(m14[m16,])] == max(m14[m16,][!is.na(m14[m16,])]), arr.ind = TRUE)
 	
 	cat( " ||  ","feature that will be used to partition is: Feature", m17)
 	
@@ -345,7 +351,7 @@ partition<-function(dataset1, partition2){
 	
 	m23<-noquote(m22)
 	
-	write.table(m23,"/Users/Dungeoun/Documents/Amit UTD Course Material/Machine Learning CS 6375 /output100.txt",quote = FALSE, col.names = FALSE)
+	write.table(m23,"/Users/Dungeoun/Documents/Amit UTD Course Material/Machine Learning CS 6375 /output200.txt",quote = FALSE, col.names = FALSE)
 	
 }
 	
