@@ -1,29 +1,11 @@
 
 
 
-Program <- function(){
-	
-	
-	n <- readline(prompt="Enter program name: ")
-	
-
-}
-
-
-dataset1<-read.table("/Users/Dungeoun/Documents/Amit UTD Course Material/Machine Learning CS 6375 /sam1.txt", fill = TRUE)
-partition2<-read.table("/Users/Dungeoun/Documents/Amit UTD Course Material/Machine Learning CS 6375 /part2.txt", fill = TRUE)
-
-
-d1<-read.table("/Users/Dungeoun/Documents/Amit UTD Course Material/Machine Learning CS 6375 /sam1.txt", fill = TRUE)
-p2<-read.table("/Users/Dungeoun/Documents/Amit UTD Course Material/Machine Learning CS 6375 /part2.txt", fill = TRUE)
-
-
-
 # Code to clean the data and extract info
 
 
 
-partition<-function(dataset1, partition2){
+partition<-function(dataset1, partition2, output){
 	
 	
 	install.packages("plyr")
@@ -45,7 +27,7 @@ partition<-function(dataset1, partition2){
 	#p2: partitions
 	#pf: Final partition table
 	
-	d1<-read.table(file=partition2,fill =TRUE)
+	p2<-read.table(file=partition2,fill =TRUE)
 	p2<-as.data.frame(p2)
 	rownames(p2)<-p2$V1
 	pf<-p2[,2:ncol(p2)]
@@ -64,18 +46,16 @@ partition<-function(dataset1, partition2){
 		
 		x<-pf[,i]
 		
-		#tryCatch({
 		m1[i,1]<- length(x[!is.na(x)])		# taking only non NA Values 														# and
 														# storing them in m1
 					
-		#}, error=function(e){cat("ERROR1 :",conditionMessage(e), "\n")})
-	}
+			}
 	
 	# m2: matrices holding the last column contents of different partitions
 	
 	m2<-matrix(NA,max(m1),length(m1))
 	
-	for(i in 1:nrow(m2)){
+	for(i in 1:ncol(m2)){
 		tryCatch({
 		for(j in 1:m1[i,1]){
 			
@@ -89,6 +69,7 @@ partition<-function(dataset1, partition2){
 		}
 		}, error=function(e){})
 	}
+	
 	
 	# m3: matrix holding the frequencies of different elements of last column
 	
@@ -112,7 +93,7 @@ partition<-function(dataset1, partition2){
 			
 	}
 	
-	
+
 	
 	
 	
@@ -162,7 +143,7 @@ partition<-function(dataset1, partition2){
 					
 				}
 				
-				print(m7)
+				#print(m7)
 				
 				#Calculate entropy of this matrix
 				
@@ -171,19 +152,19 @@ partition<-function(dataset1, partition2){
 				# 1.1: m8: matrix of unique labels
 				m8<-matrix(NA,nrow(m7),1)
 				m8<-t(t(count(m7[,1][!is.na(m7[,1])])$x))
-				print(m8)
+				#print(m8)
 				
 				# 1.2: m9: matrix of freq of each label
 				m9<-matrix(NA,nrow(m7),1)	
 				m9<-t(t(count(m7[,1][!is.na(m7[,1])])$freq))
-				print(m9)
+				#print(m9)
 				# 1.3: m10: Probability of each label from total no. of labels
 				
 				m10<-matrix(NA, nrow(m9),1)
 				for( i in 1: nrow(m9)){
 					m10[i,1]<-m9[i,1]/sum(m9)
 				}	
-				print(m10)
+				#print(m10)
 				#Step 2: Calculate the probabilities of last attributes	
 				
 				# 2.1: m11:Matrix Containing the Values according to the uniqueness of the labels columnwise
@@ -202,7 +183,7 @@ partition<-function(dataset1, partition2){
 					}
 								
 				}
-				print(m11)
+				#print(m11)
 				#2.2: m12: Matrix holds the probabilities in different columns of each unique label
 				
 				m12<-matrix(1, nrow(m7), ncol(m11))		
@@ -215,7 +196,7 @@ partition<-function(dataset1, partition2){
 					}
 				}
 				
-				print(m12)
+				#print(m12)
 				
 				#Step 3: Calculate Entropy of the which is also the conditional probability
 				
@@ -237,15 +218,17 @@ partition<-function(dataset1, partition2){
 				
 			m6[l,k]<-sum(m13[!is.na(m13)])
 		}
-		print(l)			
+				
 	}
-
+	
+	
+	
 	# m14 :  Gain Matrix
 	
 	m14<-matrix(NA,nrow(m6),ncol(m6))
 	
 	for(i in 1: ncol(m5)){
-		for(j in 1:nrow(m6)){
+		for(j in 1:ncol(m6)){
 			
 			m14[i,j]<- m5[1,i] - m6[i,j] 
 			
@@ -264,6 +247,13 @@ partition<-function(dataset1, partition2){
 			
 		
 	}
+	
+	
+	
+	if(all(m15== 0)){
+		stop("No Split possible")
+	}
+		
 	
 	# m16: Store Which Partition will get partitioned first
 	
@@ -347,11 +337,13 @@ partition<-function(dataset1, partition2){
 	
 	m22<-rbind(temp,m20)
 	
+	
+	
 	m22[is.na(m22)]<-c("")
 	
 	m23<-noquote(m22)
 	
-	write.table(m23,"/Users/Dungeoun/Documents/Amit UTD Course Material/Machine Learning CS 6375 /output200.txt",quote = FALSE, col.names = FALSE)
+	write.table(m23,file = output,quote = FALSE, col.names = FALSE)
 	
 }
 	
