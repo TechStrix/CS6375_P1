@@ -1,7 +1,7 @@
 
 
 
-# Code to clean the data and extract info
+# ID3 project
 
 
 
@@ -16,7 +16,7 @@ partition<-function(dataset1, partition2, output){
 	#d1: Dataset table
 	#df: final dataset table
 	
-	d1<-read.table(file=dataset1,fill = TRUE)
+	d1<-read.table(file=dataset1,sep = "",fill = TRUE)
 
 	d1<-as.data.frame(d1)
 	df<-d1[2:nrow(d1),]
@@ -27,7 +27,7 @@ partition<-function(dataset1, partition2, output){
 	#p2: partitions
 	#pf: Final partition table
 	
-	p2<-read.table(file=partition2,fill =TRUE)
+	p2<-read.table(file=partition2,sep="",fill =TRUE)
 	p2<-as.data.frame(p2)
 	rownames(p2)<-p2$V1
 	pf<-p2[,2:ncol(p2)]
@@ -250,7 +250,7 @@ partition<-function(dataset1, partition2, output){
 	
 	
 	
-	if(all(m15== 0)){
+	if(all(m15 == 0)){
 		stop("No Split possible")
 	}
 		
