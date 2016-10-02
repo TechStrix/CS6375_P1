@@ -265,7 +265,13 @@ partition<-function(dataset1, partition2, output){
 	
 	m17<-which(m14[m16,][!is.na(m14[m16,])] == max(m14[m16,][!is.na(m14[m16,])]), arr.ind = TRUE)
 	
+	if(length(m17)>1){
+		m17<-m17[1]
+	}
+	
 	cat( " ||  ","feature that will be used to partition is: Feature", m17)
+	
+	print(m17)
 	
 	#m18: partition to be divided and it's target values 
 	#m19: final Partitions 
@@ -326,7 +332,7 @@ partition<-function(dataset1, partition2, output){
 	m21<-matrix(NA,1,nrow(m19))
 	
 	for( i in 1:nrow(m20)){
-		m21[1,i]<-paste(colnames(pf)[m16],i)
+		m21[1,i]<-paste(colnames(pf)[m16],i,sep ='')
 	}
 	
 	rownames(m20)<- m21
@@ -335,15 +341,21 @@ partition<-function(dataset1, partition2, output){
 	
 	colnames(temp)<-NULL
 	
-	m22<-rbind(temp,m20)
+	#m22<-rbind(temp,m20)
+	
+	temp[is.na(temp)]<-c("")
+	
+	temp<-noquote(temp)
 	
 	
 	
-	m22[is.na(m22)]<-c("")
+	m20[is.na(m20)]<-c("")
 	
-	m23<-noquote(m22)
+	m20<-noquote(m20)
 	
-	write.table(m23,file = output,quote = FALSE, col.names = FALSE)
+	write.table(temp,file = output,quote = FALSE, col.names = FALSE, append = TRUE)
+	
+	write.table(m20,file = output,quote = FALSE, col.names = FALSE, append = TRUE)
 	
 }
 	
